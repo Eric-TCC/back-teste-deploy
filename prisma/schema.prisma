@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// CRIAR UMA MIGRATION: yarn prisma migrate dev
+model User {
+  id         String    @id @default(uuid())
+  name       String
+  email      String
+  password   String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  @@map("users")
+}
+
+model Sector {
+  id          String    @id @default(uuid())
+  name        String
+  description String
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  products    Product[]
+
+  @@map("sectors")
+}
+
+model Product {
+  id            String    @id @default(uuid())
+  name          String
+  price         String
+  description   String
+  banner        String
+  quantidadeMin String
+  created_at    DateTime? @default(now())
+  updated_at    DateTime? @default(now())
+  quantidade    Int       @default(0)
+
+  sector    Sector   @relation(fields: [sector_id], references: [id])
+  sector_id String
+  Entry     Entry[] // Remova o onDelete aqui
+  Output    Output[] // Remova o onDelete aqui
+
+  @@map("products")
+}
+
+model Entry {
+  id         String    @id @default(uuid())
+  created_at DateTime? @default(now())
+  quantidade Int
+
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade) // Adicione o onDelete aqui
+  product_id String
+
+  @@map("entries")
+}
+
+model Output {
+  id         String    @id @default(uuid())
+  created_at DateTime? @default(now())
+  quantidade Int
+
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade) // Adicione o onDelete aqui
+  product_id String
+
+  @@map("outputs")
+}
+
+model Supplier {
+  id                String @id @default(uuid())
+  name              String
+  cnpj              String
+  inscricaoEstadual String
+
+  @@map("suppliers")
+}
